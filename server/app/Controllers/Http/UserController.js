@@ -48,11 +48,11 @@ class UserController {
     return user
   }
 
+  //email retirado
   async update ({ request, params, response }) {
     const { permissions, roles, ...data } = request.only([
       'username',
       'name',
-      'email',
       'password',
       'dados_pessoais_id',
       'permissions',
@@ -84,6 +84,13 @@ class UserController {
     const user = await User.findOrFail(params.id)
     await user.merge({ active: 0 })
     return user.save()
+  }
+
+  async hasRole ({ params }) {
+    const { userId, role } = params
+    const user = await User.findOrFail(userId)
+    const hasRole = await user.is(role)
+    return hasRole
   }
 }
 
