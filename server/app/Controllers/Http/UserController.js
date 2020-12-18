@@ -50,8 +50,6 @@ class UserController {
 
   async update ({ request, params, response }) {
     const { permissions, roles, ...data } = request.only([
-      'username',
-      'name',
       'email',
       'password',
       'dados_pessoais_id',
@@ -84,6 +82,18 @@ class UserController {
     const user = await User.findOrFail(params.id)
     await user.merge({ active: 0 })
     return user.save()
+  }
+
+  async hasPermission ({ params }) {
+    const { userId, permission } = params
+    const user = await User.findOrFail(userId)
+    const hasPermission = await user.can(permission)
+    const notAllowed = await user.can(`${permission}_NOT`)
+    if (notAllowed) {
+      return false
+    }
+ 
+    return hasPermission
   }
 }
 
